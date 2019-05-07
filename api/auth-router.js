@@ -31,8 +31,11 @@ router.post("/login", (req, res) => {
     .then(user => {
       //
       if (user && bcrypt.compareSync(password, user.password)) {
+        req.session.username = user.username;
         res.status(200).json({
-          message: `Welcome ${user.username}! You are now logged in! `
+          message: `Welcome ${
+            user.username
+          }! You are now logged in! and you get a cookie :) `
         });
       } else {
         res.status(401).json({ message: "YOU SHALL NOT PASS" });
@@ -41,6 +44,21 @@ router.post("/login", (req, res) => {
     .catch(error => {
       res.status(500).json(error);
     });
+});
+
+//logout
+router.get("/logout", (req, res) => {
+  if (req.session) {
+    req.session.destroy(err => {
+      if (err) {
+        res.send("you shall not leave");
+      } else {
+        res.send("BYE");
+      }
+    });
+  } else {
+    res.end();
+  }
 });
 
 module.exports = router;
